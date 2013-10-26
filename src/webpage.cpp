@@ -1069,6 +1069,7 @@ qreal stringToPointSize(const QString &string)
         { "mm", 72 / 25.4 },
         { "cm", 72 / 2.54 },
         { "in", 72 },
+        { "pt", 1 },
         { "px", 72.0 / PHANTOMJS_PDF_DPI },
         { "", 72.0 / PHANTOMJS_PDF_DPI }
     };
@@ -1094,7 +1095,7 @@ qreal printMargin(const QVariantMap &map, const QString &key)
 
 bool WebPage::renderPdf(const QString &fileName)
 {
-    QPrinter printer;
+    QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(fileName);
     printer.setResolution(PHANTOMJS_PDF_DPI);
@@ -1108,8 +1109,8 @@ bool WebPage::renderPdf(const QString &fileName)
     }
 
     if (paperSize.contains("width") && paperSize.contains("height")) {
-        const QSizeF sizePt(ceil(stringToPointSize(paperSize.value("width").toString())),
-                            ceil(stringToPointSize(paperSize.value("height").toString())));
+        const QSizeF sizePt(stringToPointSize(paperSize.value("width").toString()),
+                            stringToPointSize(paperSize.value("height").toString()));
         printer.setPaperSize(sizePt, QPrinter::Point);
     } else if (paperSize.contains("format")) {
         const QPrinter::Orientation orientation = paperSize.contains("orientation")
